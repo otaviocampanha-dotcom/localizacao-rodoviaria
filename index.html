@@ -49,6 +49,10 @@
     let ultimaLat = null;
     let ultimaLon = null;
     let pontoMaisProximo = null;
+function abrirNoGoogleMaps(latitude, longitude) {
+  const url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latitude},${longitude}`;
+  window.open(url, '_blank');
+}
 
     function parseCSV(text) {
       const lines = text.trim().split(/\r?\n/);
@@ -196,10 +200,11 @@
     }
 
     function abrirNoMaps() {
-      if (ultimaLat && ultimaLon) {
-        const url = `https://www.google.com/maps?q=${ultimaLat},${ultimaLon}`;
-        window.open(url, "_blank");
-      }
+   if (ultimaLat && ultimaLon) {
+    const url = `https://www.google.com/maps?q=${ultimaLat},${ultimaLon}`;
+    window.open(url, "_blank");
+}
+
     }
 
     function abrirPontoNoMaps() {
@@ -231,6 +236,7 @@
 
 </body>
 </html>
+
 
 
 
