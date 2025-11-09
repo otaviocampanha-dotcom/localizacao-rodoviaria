@@ -18,6 +18,32 @@
       cursor: pointer;
       display: inline-block;
     }
+    /* 📱 Ajustes para telas pequenas */
+@media (max-width: 480px) {
+  h2 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  button, label {
+    font-size: 14px;
+    padding: 8px;
+    width: 100%;
+  }
+
+  input[type="file"] {
+    width: 100%;
+  }
+
+  #lat, #lon, #precisao {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  #output {
+    font-size: 14px;
+  }
+}
   </style>
 </head>
 <body>
@@ -225,5 +251,6 @@
   </script>
 </body>
 </html>
+
 
 
