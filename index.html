@@ -8,7 +8,7 @@
     button { margin: 5px; }
     #alerta { color: red; font-weight: bold; }
     #output { white-space: pre-line; font-weight: bold; }
-    #mapaBtn { display: none; margin-top: 10px; }
+    #mapaBtn, #pontoBtn { display: none; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -22,7 +22,8 @@
   <p>Precisão: <span id="precisao">--</span></p>
   <p id="alerta"></p>
   <p id="output"></p>
-  <button id="mapaBtn" onclick="abrirNoMaps()">Abrir no Google Maps</button>
+  <button id="mapaBtn" onclick="abrirNoMaps()">Abrir minha localização no Google Maps</button>
+  <button id="pontoBtn" onclick="abrirPontoNoMaps()">Abrir ponto mais próximo no Google Maps</button>
 
   <script>
     let points = [];
@@ -73,6 +74,7 @@
 
       document.getElementById("output").textContent = "Calculando menor distância, aguarde…";
       document.getElementById("mapaBtn").style.display = "none";
+      document.getElementById("pontoBtn").style.display = "none";
 
       navigator.geolocation.getCurrentPosition(pos => {
         const lat1 = pos.coords.latitude;
@@ -116,6 +118,9 @@
 
           document.getElementById("output").textContent = mensagem;
           document.getElementById("mapaBtn").style.display = "inline-block";
+          document.getElementById("pontoBtn").style.display = "inline-block";
+          document.getElementById("pontoBtn").setAttribute("data-lat", nearest.lat);
+          document.getElementById("pontoBtn").setAttribute("data-lon", nearest.lon);
         }, 500);
       },
       error => {
@@ -131,6 +136,16 @@
     function abrirNoMaps() {
       if (ultimaLat && ultimaLon) {
         const url = `https://www.google.com/maps?q=${ultimaLat},${ultimaLon}`;
+        window.open(url, "_blank");
+      }
+    }
+
+    function abrirPontoNoMaps() {
+      const btn = document.getElementById("pontoBtn");
+      const lat = btn.getAttribute("data-lat");
+      const lon = btn.getAttribute("data-lon");
+      if (lat && lon) {
+        const url = `https://www.google.com/maps?q=${lat},${lon}`;
         window.open(url, "_blank");
       }
     }
