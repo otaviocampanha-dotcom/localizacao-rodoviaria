@@ -6,8 +6,8 @@
   <style>
     body { font-family: Arial; padding: 20px; }
     button { margin: 5px; }
-    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
     #alerta { color: red; font-weight: bold; }
+    #output { white-space: pre-line; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -15,10 +15,6 @@
 
   <input type="file" id="csvFile" accept=".csv" />
   <button onclick="iniciarLocalizacao()">Obter Localização Atual</button>
-  <button onclick="savePoint('A')">Salvar Localização A</button>
-  <button onclick="savePoint('B')">Salvar Localização B</button>
-  <button onclick="calculateAB()">Calcular Distância A↔B</button>
-  <button onclick="exportHistory()">Exportar Histórico</button>
 
   <p>Latitude: <span id="lat">--</span></p>
   <p>Longitude: <span id="lon">--</span></p>
@@ -26,14 +22,8 @@
   <p id="alerta"></p>
   <p id="output"></p>
 
-  <table id="historyTable">
-    <tr><th>Data</th><th>Lat</th><th>Lon</th><th>Rodovia</th><th>Km</th><th>Sentido</th><th>Distância</th><th>A↔B</th></tr>
-  </table>
-
   <script>
     let points = [];
-    let history = [];
-    let pointA = null, pointB = null;
 
     function parseCSV(text) {
       const lines = text.trim().split("\n").slice(1);
@@ -51,50 +41,49 @@
     });
 
     function iniciarLocalizacao() {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.watchPosition(pos => {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          const accuracy = pos.coords.accuracy;
+      if (!points.length) {
+        alert("Carregue a planilha primeiro.");
+        return;
+      }
 
-          document.getElementById("lat").textContent = lat.toFixed(6);
-          document.getElementById("lon").textContent = lon.toFixed(6);
-          document.getElementById("precisao").textContent = accuracy + " metros";
+      document.getElementById("output").textContent = "Calculando menor distância, aguarde…";
 
-          if (accuracy > 300) {
-            document.getElementById("alerta").textContent = "⚠️ GPS muito impreciso. Aguarde melhor sinal.";
-            return;
-          } else if (accuracy > 100) {
-            document.getElementById("alerta").textContent = "⚠️ GPS moderado. Dados podem ter pequena variação.";
-          } else {
-            document.getElementById("alerta").textContent = "";
-          }
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const accuracy = pos.coords.accuracy;
 
+        document.getElementById("lat").textContent = lat.toFixed(6);
+        document.getElementById("lon").textContent = lon.toFixed(6);
+        document.getElementById("precisao").textContent = accuracy + " metros";
+
+        if (accuracy > 300) {
+          document.getElementById("alerta").textContent = "⚠️ GPS muito impreciso. Aguarde melhor sinal.";
+          return;
+        } else if (accuracy > 100) {
+          document.getElementById("alerta").textContent = "⚠️ GPS moderado. Dados podem ter pequena variação.";
+        } else {
+          document.getElementById("alerta").textContent = "";
+        }
+
+        setTimeout(() => {
           const nearest = findNearest(lat, lon);
           const dist = haversine(lat, lon, nearest.lat, nearest.lon);
-          const now = new Date().toLocaleString();
-
-          history.push({ date: now, lat, lon, ...nearest, dist: dist.toFixed(1), ab: "" });
-          updateTable();
-
           let mensagem = `Mais próximo: ${nearest.rodovia}, km ${nearest.km} ${nearest.sentido} (${dist.toFixed(1)} m)`;
           if (dist > 500) {
             mensagem += "\nPossivelmente fora da faixa de domínio da concessionária";
           }
-
-          document.getElementById("output").innerText = mensagem;
-        },
-        error => {
-          alert("Erro ao obter localização: " + error.message);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        });
-      } else {
-        alert("Geolocalização não é suportada neste navegador.");
-      }
+          document.getElementById("output").textContent = mensagem;
+        }, 500); // pequena pausa para simular processamento
+      },
+      error => {
+        alert("Erro ao obter localização: " + error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      });
     }
 
     function findNearest(lat, lon) {
@@ -116,47 +105,6 @@
       const dLon = toRad(lon2 - lon1);
       const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-
-    function savePoint(label) {
-      const lat = parseFloat(document.getElementById("lat").textContent);
-      const lon = parseFloat(document.getElementById("lon").textContent);
-      if (isNaN(lat) || isNaN(lon)) {
-        alert("Localização não disponível.");
-        return;
-      }
-      const coord = { lat, lon };
-      if (label === 'A') pointA = coord;
-      else pointB = coord;
-      alert(`Localização ${label} salva.`);
-    }
-
-    function calculateAB() {
-      if (!pointA || !pointB) return alert("Salve os dois pontos primeiro.");
-      const dist = haversine(pointA.lat, pointA.lon, pointB.lat, pointB.lon);
-      const last = history[history.length - 1];
-      if (last) last.ab = dist.toFixed(1);
-      updateTable();
-      alert(`Distância entre A e B: ${dist.toFixed(1)} metros`);
-    }
-
-    function updateTable() {
-      const rows = history.map(h =>
-        `<tr><td>${h.date}</td><td>${h.lat}</td><td>${h.lon}</td><td>${h.rodovia}</td><td>${h.km}</td><td>${h.sentido}</td><td>${h.dist}</td><td>${h.ab}</td></tr>`
-      ).join("");
-      document.getElementById("historyTable").innerHTML =
-        `<tr><th>Data</th><th>Lat</th><th>Lon</th><th>Rodovia</th><th>Km</th><th>Sentido</th><th>Distância</th><th>A↔B</th></tr>` + rows;
-    }
-
-    function exportHistory() {
-      const csv = "Data,Lat,Lon,Rodovia,Km,Sentido,Distância,A↔B\n" +
-        history.map(h => `${h.date},${h.lat},${h.lon},${h.rodovia},${h.km},${h.sentido},${h.dist},${h.ab}`).join("\n");
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "historico_localizacao.csv";
-      a.click();
     }
   </script>
 </body>
