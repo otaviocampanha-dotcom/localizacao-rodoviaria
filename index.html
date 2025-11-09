@@ -214,23 +214,20 @@
 
       const lat1r = toRad(90 - lat1);
       const lat2r = toRad(90 - lat2);
+      const lonDiff = toRad(lon1
+                            unction calcularDistanciaMacro(lat1, lon1, lat2, lon2) {
+      const toRad = deg => deg * Math.PI / 180;
+      const R = 6371; // km
+
+      const lat1r = toRad(90 - lat1);
+      const lat2r = toRad(90 - lat2);
       const lonDiff = toRad(lon1 - lon2);
 
       const cosDist = Math.cos(lat1r) * Math.cos(lat2r) + Math.sin(lat1r) * Math.sin(lat2r) * Math.cos(lonDiff);
-      const dist = R * Math.acos(cosDist
-                                 function calcularDistanciaMacro(lat1, lon1, lat2, lon2) {
-  const toRad = deg => deg * Math.PI / 180;
-  const R = 6371; // km
+      const dist = R * Math.acos(cosDist) * 1000; // metros
 
-  const lat1r = toRad(90 - lat1);
-  const lat2r = toRad(90 - lat2);
-  const lonDiff = toRad(lon1 - lon2);
-
-  const cosDist = Math.cos(lat1r) * Math.cos(lat2r) + Math.sin(lat1r) * Math.sin(lat2r) * Math.cos(lonDiff);
-  const dist = R * Math.acos(cosDist) * 1000; // metros
-
-  return dist;
-}
-</script>
+      return dist;
+    }
+  </script>
 </body>
 </html>
