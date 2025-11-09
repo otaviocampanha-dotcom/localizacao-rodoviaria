@@ -47,12 +47,11 @@
     .then(texto => parseCSV(texto));
 </script>
 
+  <div id="botoes">
   <button onclick="iniciarLocalizacao()">Obter Localização Atual</button>
-
-  <br><br>
   <input type="file" id="fotoInput" accept="image/*" />
   <button onclick="usarLocalizacaoDaFoto()">Usar localização da foto</button>
-
+</div>
   <p>Latitude: <span id="lat">--</span></p>
   <p>Longitude: <span id="lon">--</span></p>
   <p>Precisão: <span id="precisao">--</span></p>
@@ -243,6 +242,7 @@
   </script>
 </body>
 </html>
+
 
 
 
