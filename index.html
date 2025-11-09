@@ -30,17 +30,23 @@
     let ultimaLon = null;
 
     function parseCSV(text) {
-      const lines = text.trim().split("\n").slice(1);
-      points = lines.map(line => {
-        const [rodovia, km, sentido, lat, lon] = line.split(",");
-        return {
-          rodovia: rodovia.trim(),
-          km: km.trim(),
-          sentido: sentido.trim(),
-          lat: parseFloat(lat),
-          lon: parseFloat(lon)
-        };
-      });
+      const lines = text.trim().split(/\r?\n/);
+      points = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(",");
+        if (cols.length >= 5) {
+          const [rodovia, km, sentido, lat, lon] = cols;
+          points.push({
+            rodovia: rodovia.trim(),
+            km: km.trim(),
+            sentido: sentido.trim(),
+            lat: parseFloat(lat),
+            lon: parseFloat(lon)
+          });
+        }
+      }
+
       alert("Planilha carregada com " + points.length + " pontos.");
     }
 
@@ -82,7 +88,7 @@
 
         setTimeout(() => {
           const nearest = findNearest(lat, lon);
-          const dist = haversine(lat, lon, nearest.lat, nearest.lon);
+          const dist = nearest.distancia;
           let mensagem = `Mais próximo: ${nearest.rodovia}, km ${nearest.km} ${nearest.sentido} (${dist.toFixed(1)} m)`;
           if (parseFloat(dist) > 500) {
             mensagem += "\nPossivelmente fora da faixa de domínio da concessionária";
@@ -109,14 +115,17 @@
     }
 
     function findNearest(lat, lon) {
-      let minDist = Infinity, nearest = null;
-      for (const p of points) {
+      let minDist = Infinity;
+      let nearest = null;
+
+      points.forEach(p => {
         const d = haversine(lat, lon, p.lat, p.lon);
         if (d < minDist) {
           minDist = d;
-          nearest = p;
+          nearest = { ...p, distancia: d };
         }
-      }
+      });
+
       return nearest;
     }
 
