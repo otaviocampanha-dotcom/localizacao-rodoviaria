@@ -35,14 +35,18 @@
 
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(",");
-        if (cols.length >= 5) {
-          const [rodovia, km, sentido, lat, lon] = cols;
+        if (cols.length >= 6) {
+          let lat = cols[3].replace(",", ".").trim();
+          let lon = cols[4].replace(",", ".").trim();
+          let dist = cols[5].replace(",", ".").trim();
+
           points.push({
-            rodovia: rodovia.trim(),
-            km: km.trim(),
-            sentido: sentido.trim(),
+            rodovia: cols[0].trim(),
+            km: cols[1].trim(),
+            sentido: cols[2].trim(),
             lat: parseFloat(lat),
-            lon: parseFloat(lon)
+            lon: parseFloat(lon),
+            distancia: parseFloat(dist)
           });
         }
       }
@@ -87,12 +91,15 @@
         }
 
         setTimeout(() => {
-          const nearest = findNearest(lat, lon);
+          const sorted = points.slice().sort((a, b) => a.distancia - b.distancia);
+          const nearest = sorted[0];
           const dist = nearest.distancia;
+
           let mensagem = `Mais próximo: ${nearest.rodovia}, km ${nearest.km} ${nearest.sentido} (${dist.toFixed(1)} m)`;
-          if (parseFloat(dist) > 500) {
+          if (dist > 500) {
             mensagem += "\nPossivelmente fora da faixa de domínio da concessionária";
           }
+
           document.getElementById("output").textContent = mensagem;
           document.getElementById("mapaBtn").style.display = "inline-block";
         }, 500);
@@ -112,30 +119,6 @@
         const url = `https://www.google.com/maps?q=${ultimaLat},${ultimaLon}`;
         window.open(url, "_blank");
       }
-    }
-
-    function findNearest(lat, lon) {
-      let minDist = Infinity;
-      let nearest = null;
-
-      points.forEach(p => {
-        const d = haversine(lat, lon, p.lat, p.lon);
-        if (d < minDist) {
-          minDist = d;
-          nearest = { ...p, distancia: d };
-        }
-      });
-
-      return nearest;
-    }
-
-    function haversine(lat1, lon1, lat2, lon2) {
-      const R = 6371000;
-      const toRad = deg => deg * Math.PI / 180;
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
   </script>
 </body>
