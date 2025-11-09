@@ -29,6 +29,7 @@
     let points = [];
     let ultimaLat = null;
     let ultimaLon = null;
+    let pontoMaisProximo = null;
 
     function parseCSV(text) {
       const lines = text.trim().split(/\r?\n/);
@@ -110,6 +111,8 @@
             }
           });
 
+          pontoMaisProximo = nearest;
+
           const dist = nearest.distancia;
           let mensagem = `Mais próximo: ${nearest.rodovia}, km ${nearest.km} ${nearest.sentido} (${dist.toFixed(1)} m)`;
           if (dist > 500) {
@@ -119,8 +122,6 @@
           document.getElementById("output").textContent = mensagem;
           document.getElementById("mapaBtn").style.display = "inline-block";
           document.getElementById("pontoBtn").style.display = "inline-block";
-          document.getElementById("pontoBtn").setAttribute("data-lat", nearest.lat);
-          document.getElementById("pontoBtn").setAttribute("data-lon", nearest.lon);
         }, 500);
       },
       error => {
@@ -141,11 +142,8 @@
     }
 
     function abrirPontoNoMaps() {
-      const btn = document.getElementById("pontoBtn");
-      const lat = btn.getAttribute("data-lat");
-      const lon = btn.getAttribute("data-lon");
-      if (lat && lon) {
-        const url = `https://www.google.com/maps?q=${lat},${lon}`;
+      if (pontoMaisProximo && pontoMaisProximo.lat && pontoMaisProximo.lon) {
+        const url = `https://www.google.com/maps?q=${pontoMaisProximo.lat},${pontoMaisProximo.lon}`;
         window.open(url, "_blank");
       }
     }
