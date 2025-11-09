@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Localização Rodoviária</title>
   <style>
     body { font-family: Arial; padding: 20px; }
@@ -18,65 +17,30 @@
       cursor: pointer;
       display: inline-block;
     }
-    #botoes {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  @media (max-width: 600px) {
-    #botoes {
-      width: 100%;
-    }
-
-    button, input[type="file"] {
-      width: 100%;
-    }
-  }
-.botao-destaque {
-  font-size: 1.2em;
-}
   </style>
 </head>
 <body>
   <h2>📍 Localização Rodoviária</h2>
-<img src="logo.jpg" alt="Logo da empresa" style="max-width: 200px; display: block; margin: 0 auto 20px;">
+
  <script>
   fetch('Relação Total - Lote 13 adaptada.csv')
     .then(response => response.text())
     .then(texto => parseCSV(texto));
 </script>
 
-  <div id="botoes">
   <button onclick="iniciarLocalizacao()">Obter Localização Atual</button>
-    <br><br>
-<button onclick="salvarPontoA()">Salvar como ponto A</button>
-<button onclick="calcularDistanciaComPontoA()">Calcular distância até ponto A</button>
-<p id="resultadoPontoA"></p>
 
+  <br><br>
   <input type="file" id="fotoInput" accept="image/*" />
   <button onclick="usarLocalizacaoDaFoto()">Usar localização da foto</button>
-</div>
+
   <p>Latitude: <span id="lat">--</span></p>
   <p>Longitude: <span id="lon">--</span></p>
   <p>Precisão: <span id="precisao">--</span></p>
   <p id="alerta"></p>
   <p id="output"></p>
-
-<h3>📏 Calcular distância entre dois pontos</h3>
-<div id="distanciaManual">
-  <label>Latitude A: <input type="number" step="any" id="latA"></label><br>
-  <label>Longitude A: <input type="number" step="any" id="lonA"></label><br>
-  <label>Latitude B: <input type="number" step="any" id="latB"></label><br>
-  <label>Longitude B: <input type="number" step="any" id="lonB"></label><br>
-  <button onclick="calcularDistanciaManual()">Calcular distância</button>
-  <p id="resultadoDistancia"></p>
-</div>
-
-<button id="mapaBtn" onclick="abrirNoMaps()">Abrir minha localização no Google Maps</button>
-<button id="pontoBtn" onclick="abrirPontoNoMaps()">Abrir ponto mais próximo no Google Maps</button>
+  <button id="mapaBtn" onclick="abrirNoMaps()">Abrir minha localização no Google Maps</button>
+  <button id="pontoBtn" onclick="abrirPontoNoMaps()">Abrir ponto mais próximo no Google Maps</button>
 
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <script>
@@ -84,7 +48,6 @@
     let ultimaLat = null;
     let ultimaLon = null;
     let pontoMaisProximo = null;
-    let pontoA = null;
 
     function parseCSV(text) {
       const lines = text.trim().split(/\r?\n/);
@@ -258,48 +221,6 @@
 
       return dist;
     }
-
-function calcularDistanciaManual() {
-  const latA = parseFloat(document.getElementById("latA").value);
-  const lonA = parseFloat(document.getElementById("lonA").value);
-  const latB = parseFloat(document.getElementById("latB").value);
-  const lonB = parseFloat(document.getElementById("lonB").value);
-
-  if (isNaN(latA) || isNaN(lonA) || isNaN(latB) || isNaN(lonB)) {
-    document.getElementById("resultadoDistancia").textContent = "Preencha todas as coordenadas corretamente.";
-    return;
-  }
-
-  const distancia = calcularDistanciaMacro(latA, lonA, latB, lonB);
-  document.getElementById("resultadoDistancia").textContent = `Distância: ${distancia.toFixed(1)} metros`;
-}
-    function salvarPontoA() {
-  if (ultimaLat && ultimaLon) {
-    pontoA = { lat: ultimaLat, lon: ultimaLon };
-    document.getElementById("resultadoPontoA").textContent = "📍 Ponto A salvo com sucesso.";
-  } else {
-    document.getElementById("resultadoPontoA").textContent = "⚠️ Nenhuma localização disponível para salvar.";
-  }
-}
-
-function calcularDistanciaComPontoA() {
-  if (!pontoA || !ultimaLat || !ultimaLon) {
-    document.getElementById("resultadoPontoA").textContent = "⚠️ Salve o ponto A e obtenha a localização atual primeiro.";
-    return;
-  }
-
-  const distancia = calcularDistanciaMacro(pontoA.lat, pontoA.lon, ultimaLat, ultimaLon);
-  document.getElementById("resultadoPontoA").textContent = `📏 Distância até ponto A: ${distancia.toFixed(1)} metros`;
-}
-</script>
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
