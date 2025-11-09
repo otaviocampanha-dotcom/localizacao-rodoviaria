@@ -223,8 +223,15 @@
       return dist;
     }
   </script>
+  function abrirNoGoogleMaps(latitude, longitude) {
+    const url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latitude},${longitude}`;
+    window.open(url, '_blank');
+  }
+</script>
+
 </body>
 </html>
+
 
 
 
