@@ -252,9 +252,28 @@
 
       return dist;
     }
+      return dist;
+}
+
+function calcularDistanciaManual() {
+  const latA = parseFloat(document.getElementById("latA").value);
+  const lonA = parseFloat(document.getElementById("lonA").value);
+  const latB = parseFloat(document.getElementById("latB").value);
+  const lonB = parseFloat(document.getElementById("lonB").value);
+
+  if (isNaN(latA) || isNaN(lonA) || isNaN(latB) || isNaN(lonB)) {
+    document.getElementById("resultadoDistancia").textContent = "Preencha todas as coordenadas corretamente.";
+    return;
+  }
+
+  const distancia = calcularDistanciaMacro(latA, lonA, latB, lonB);
+  document.getElementById("resultadoDistancia").textContent = `Distância: ${distancia.toFixed(1)} metros`;
+}
+</script>
   </script>
 </body>
 </html>
+
 
 
 
