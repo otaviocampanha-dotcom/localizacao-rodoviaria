@@ -34,7 +34,8 @@
       points = [];
 
       for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(",");
+        const sep = lines[i].includes(";") ? ";" : ",";
+        const cols = lines[i].split(sep);
         if (cols.length >= 6) {
           let lat = cols[3].replace(",", ".").trim();
           let lon = cols[4].replace(",", ".").trim();
