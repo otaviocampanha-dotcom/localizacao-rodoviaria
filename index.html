@@ -8,6 +8,7 @@
     button { margin: 5px; }
     #alerta { color: red; font-weight: bold; }
     #output { white-space: pre-line; font-weight: bold; }
+    #mapaBtn { display: none; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -21,9 +22,12 @@
   <p>Precisão: <span id="precisao">--</span></p>
   <p id="alerta"></p>
   <p id="output"></p>
+  <button id="mapaBtn" onclick="abrirNoMaps()">Abrir no Google Maps</button>
 
   <script>
     let points = [];
+    let ultimaLat = null;
+    let ultimaLon = null;
 
     function parseCSV(text) {
       const lines = text.trim().split("\n").slice(1);
@@ -53,11 +57,15 @@
       }
 
       document.getElementById("output").textContent = "Calculando menor distância, aguarde…";
+      document.getElementById("mapaBtn").style.display = "none";
 
       navigator.geolocation.getCurrentPosition(pos => {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
         const accuracy = pos.coords.accuracy;
+
+        ultimaLat = lat;
+        ultimaLon = lon;
 
         document.getElementById("lat").textContent = lat.toFixed(6);
         document.getElementById("lon").textContent = lon.toFixed(6);
@@ -80,6 +88,7 @@
             mensagem += "\nPossivelmente fora da faixa de domínio da concessionária";
           }
           document.getElementById("output").textContent = mensagem;
+          document.getElementById("mapaBtn").style.display = "inline-block";
         }, 500);
       },
       error => {
@@ -90,6 +99,13 @@
         timeout: 10000,
         maximumAge: 0
       });
+    }
+
+    function abrirNoMaps() {
+      if (ultimaLat && ultimaLon) {
+        const url = `https://www.google.com/maps?q=${ultimaLat},${ultimaLon}`;
+        window.open(url, "_blank");
+      }
     }
 
     function findNearest(lat, lon) {
