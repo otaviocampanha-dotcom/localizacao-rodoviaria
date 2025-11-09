@@ -61,8 +61,11 @@
           document.getElementById("lon").textContent = lon.toFixed(6);
           document.getElementById("precisao").textContent = accuracy + " metros";
 
-          if (accuracy > 100) {
-            document.getElementById("alerta").textContent = "⚠️ GPS impreciso. Aguarde melhor sinal.";
+          if (accuracy > 300) {
+            document.getElementById("alerta").textContent = "⚠️ GPS muito impreciso. Aguarde melhor sinal.";
+            return;
+          } else if (accuracy > 100) {
+            document.getElementById("alerta").textContent = "⚠️ GPS moderado. Dados podem ter pequena variação.";
           } else {
             document.getElementById("alerta").textContent = "";
           }
@@ -70,10 +73,16 @@
           const nearest = findNearest(lat, lon);
           const dist = haversine(lat, lon, nearest.lat, nearest.lon);
           const now = new Date().toLocaleString();
+
           history.push({ date: now, lat, lon, ...nearest, dist: dist.toFixed(1), ab: "" });
           updateTable();
-          document.getElementById("output").innerText =
-            `Mais próximo: ${nearest.rodovia}, km ${nearest.km} ${nearest.sentido} (${dist.toFixed(1)} m)`;
+
+          let mensagem = `Mais próximo: ${nearest.rodovia}, km ${nearest.km} ${nearest.sentido} (${dist.toFixed(1)} m)`;
+          if (dist > 500) {
+            mensagem += "\nPossivelmente fora da faixa de domínio da concessionária";
+          }
+
+          document.getElementById("output").innerText = mensagem;
         },
         error => {
           alert("Erro ao obter localização: " + error.message);
