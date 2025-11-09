@@ -17,6 +17,10 @@
   <input type="file" id="csvFile" accept=".csv" />
   <button onclick="iniciarLocalizacao()">Obter Localização Atual</button>
 
+  <br><br>
+  <input type="file" id="fotoInput" accept="image/*" />
+  <button onclick="usarLocalizacaoDaFoto()">Usar localização da foto</button>
+
   <p>Latitude: <span id="lat">--</span></p>
   <p>Longitude: <span id="lon">--</span></p>
   <p>Precisão: <span id="precisao">--</span></p>
@@ -25,6 +29,7 @@
   <button id="mapaBtn" onclick="abrirNoMaps()">Abrir minha localização no Google Maps</button>
   <button id="pontoBtn" onclick="abrirPontoNoMaps()">Abrir ponto mais próximo no Google Maps</button>
 
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <script>
     let points = [];
     let ultimaLat = null;
@@ -98,31 +103,7 @@
           document.getElementById("alerta").textContent = "";
         }
 
-        setTimeout(() => {
-          let minDist = Infinity;
-          let nearest = null;
-
-          points.forEach(p => {
-            const dist = calcularDistanciaMacro(lat1, lon1, p.lat, p.lon);
-            if (dist < minDist) {
-              minDist = dist;
-              nearest = p;
-              nearest.distancia = dist;
-            }
-          });
-
-          pontoMaisProximo = nearest;
-
-          const dist = nearest.distancia;
-          let mensagem = `Mais próximo: ${nearest.rodovia}, km ${nearest.km} ${nearest.sentido} (${dist.toFixed(1)} m)`;
-          if (dist > 500) {
-            mensagem += "\nPossivelmente fora da faixa de domínio da concessionária";
-          }
-
-          document.getElementById("output").textContent = mensagem;
-          document.getElementById("mapaBtn").style.display = "inline-block";
-          document.getElementById("pontoBtn").style.display = "inline-block";
-        }, 500);
+        calcularPontoMaisProximo(lat1, lon1);
       },
       error => {
         alert("Erro ao obter localização: " + error.message);
@@ -132,6 +113,72 @@
         timeout: 10000,
         maximumAge: 0
       });
+    }
+
+    function usarLocalizacaoDaFoto() {
+      const fileInput = document.getElementById("fotoInput");
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Selecione uma foto primeiro.");
+        return;
+      }
+
+      EXIF.getData(file, function () {
+        const lat = EXIF.getTag(this, "GPSLatitude");
+        const lon = EXIF.getTag(this, "GPSLongitude");
+        const latRef = EXIF.getTag(this, "GPSLatitudeRef");
+        const lonRef = EXIF.getTag(this, "GPSLongitudeRef");
+
+        if (!lat || !lon || !latRef || !lonRef) {
+          document.getElementById("output").textContent = "Não identificado a informação de localização da foto";
+          return;
+        }
+
+        const latitude = convertDMSToDD(lat, latRef);
+        const longitude = convertDMSToDD(lon, lonRef);
+
+        ultimaLat = latitude;
+        ultimaLon = longitude;
+
+        document.getElementById("lat").textContent = latitude.toFixed(6);
+        document.getElementById("lon").textContent = longitude.toFixed(6);
+        document.getElementById("precisao").textContent = "Extraída da foto";
+
+        calcularPontoMaisProximo(latitude, longitude);
+      });
+    }
+
+    function convertDMSToDD(dms, ref) {
+      const [deg, min, sec] = dms;
+      let dd = deg + min / 60 + sec / 3600;
+      if (ref === "S" || ref === "W") dd *= -1;
+      return dd;
+    }
+
+    function calcularPontoMaisProximo(lat1, lon1) {
+      let minDist = Infinity;
+      let nearest = null;
+
+      points.forEach(p => {
+        const dist = calcularDistanciaMacro(lat1, lon1, p.lat, p.lon);
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = p;
+          nearest.distancia = dist;
+        }
+      });
+
+      pontoMaisProximo = nearest;
+
+      const dist = nearest.distancia;
+      let mensagem = `Mais próximo: ${nearest.rodovia}, km ${nearest.km} ${nearest.sentido} (${dist.toFixed(1)} m)`;
+      if (dist > 500) {
+        mensagem += "\nPossivelmente fora da faixa de domínio da concessionária";
+      }
+
+      document.getElementById("output").textContent = mensagem;
+      document.getElementById("mapaBtn").style.display = "inline-block";
+      document.getElementById("pontoBtn").style.display = "inline-block";
     }
 
     function abrirNoMaps() {
