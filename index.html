@@ -2,13 +2,63 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Localização Rodoviária</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    button, label { margin: 5px; }
-    #alerta { color: red; font-weight: bold; }
-    #output { white-space: pre-line; font-weight: bold; }
-    #mapaBtn, #pontoBtn { display: none; margin-top: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      margin: 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    button, label {
+      font-size: 18px;
+      padding: 12px 20px;
+      margin: 10px auto;
+      display: block;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    input[type="file"] {
+      display: block;
+      margin: 10px auto;
+    }
+
+    #alerta {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    #output {
+      white-space: pre-line;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    #mapaBtn, #pontoBtn {
+      display: none;
+      margin-top: 10px;
+    }
+
     label[for="csvFile"] {
       background: #0078D4;
       color: white;
@@ -17,72 +67,23 @@
       cursor: pointer;
       display: inline-block;
     }
-    button {
-  font-size: 18px;         /* Tamanho da fonte maior */
-  padding: 12px 24px;      /* Espaçamento interno maior */
-  display: block;          /* Faz cada botão ocupar uma linha */
-  margin: 10px auto;       /* Centraliza horizontalmente */
-  width: 80%;              /* Largura relativa à página */
-  max-width: 400px;        /* Limita a largura máxima */
-  text-align: center;      /* Centraliza o texto */
-}
-    body {
-  font-family: Arial, sans-serif;
-  padding: 10px;
-  margin: 0;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-h2 {
-  text-align: center;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto 20px;
-}
-
-button, label {
-  font-size: 16px;
-  padding: 12px 20px;
-  margin: 10px auto;
-  display: block;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-}
-
-input[type="file"] {
-  display: block;
-  margin: 10px auto;
-}
-
-#output, #alerta {
-  text-align: center;
-  margin-top: 10px;
-}
   </style>
 </head>
 <body>
-<img src="https://raw.githubusercontent.com/usuario/repositorio/main/caminho/para/logo.png" alt="Logo" style="height: 80px;" />
-<div style="text-align: center;">
-</div>
-<img src="logo.jpg" alt="Logo do site" style="height: 80px; display: block; margin: 0 auto;" />
+
+  <!-- ✅ Logo único e centralizado -->
+  <img src="logo.jpg" alt="Logo do site" style="height: 80px;" />
+
   <h2>📍 Localização Rodoviária</h2>
 
- <script>
-  fetch('Relação Total - Lote 13 adaptada.csv')
-    .then(response => response.text())
-    .then(texto => parseCSV(texto));
-</script>
+  <script>
+    fetch('Relação Total - Lote 13 adaptada.csv')
+      .then(response => response.text())
+      .then(texto => parseCSV(texto));
+  </script>
 
   <button onclick="iniciarLocalizacao()">Obter Localização Atual</button>
 
-  <br><br>
   <input type="file" id="fotoInput" accept="image/*" />
   <button onclick="usarLocalizacaoDaFoto()">Usar localização da foto</button>
 
@@ -130,12 +131,6 @@ input[type="file"] {
 
       alert("Planilha carregada com " + points.length + " pontos.");
     }
-
-    document.getElementById("csvFile").addEventListener("change", function () {
-      const reader = new FileReader();
-      reader.onload = () => parseCSV(reader.result);
-      reader.readAsText(this.files[0]);
-    });
 
     function iniciarLocalizacao() {
       if (!points.length) {
@@ -254,30 +249,11 @@ input[type="file"] {
     }
 
     function abrirPontoNoMaps() {
-      if (pontoMaisProximo && pontoMaisProximo.lat && pontoMaisProximo.lon) {
-        const url = `https://www.google.com/maps?q=${pontoMaisProximo.lat},${pontoMaisProximo.lon}`;
-        window.open(url, "_blank");
-      }
-    }
-
-    function calcularDistanciaMacro(lat1, lon1, lat2, lon2) {
-      const toRad = deg => deg * Math.PI / 180;
-      const R = 6371; // km
-
-      const lat1r = toRad(90 - lat1);
-      const lat2r = toRad(90 - lat2);
-      const lonDiff = toRad(lon1 - lon2);
-
-      const cosDist = Math.cos(lat1r) * Math.cos(lat2r) + Math.sin(lat1r) * Math.sin(lat2r) * Math.cos(lonDiff);
-      const dist = R * Math.acos(cosDist) * 1000; // metros
-
-      return dist;
-    }
-  </script>
+  if (pontoMaisProximo && pontoMaisProximo.lat && pontoMaisProximo.lon) {
+    const url = `https://www.google.com/maps?q=${pontoMaisProximo.lat},${pontoMaisProximo.lon}`;
+    window.open(url, "_blank");
+  }
+}
+</script>
 </body>
 </html>
-
-
-
-
-
