@@ -20,10 +20,6 @@
   </style>
 </head>
 <body>
-  <div style="text-align: center; margin-bottom: 20px;">
-    <img src="logo.jpg" alt="Logo da Empresa" style="height: 100px;" />
-  </div>
-
   <h2>📍 Localização Rodoviária</h2>
 
   <label for="csvFile">Carregar Cadastro Rodovia</label>
@@ -209,13 +205,6 @@
     }
 
     function calcularDistanciaMacro(lat1, lon1, lat2, lon2) {
-      const toRad = deg => deg * Math.PI / 180;
-      const R = 6371; // km
-
-      const lat1r = toRad(90 - lat1);
-      const lat2r = toRad(90 - lat2);
-      const lonDiff = toRad(lon1
-                            unction calcularDistanciaMacro(lat1, lon1, lat2, lon2) {
       const toRad = deg => deg * Math.PI / 180;
       const R = 6371; // km
 
