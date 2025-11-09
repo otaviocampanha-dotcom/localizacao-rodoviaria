@@ -29,7 +29,13 @@
       const lines = text.trim().split("\n").slice(1);
       points = lines.map(line => {
         const [rodovia, km, sentido, lat, lon] = line.split(",");
-        return { rodovia, km, sentido, lat: parseFloat(lat), lon: parseFloat(lon) };
+        return {
+          rodovia: rodovia.trim(),
+          km: km.trim(),
+          sentido: sentido.trim(),
+          lat: parseFloat(lat),
+          lon: parseFloat(lon)
+        };
       });
       alert("Planilha carregada com " + points.length + " pontos.");
     }
@@ -70,11 +76,11 @@
           const nearest = findNearest(lat, lon);
           const dist = haversine(lat, lon, nearest.lat, nearest.lon);
           let mensagem = `Mais próximo: ${nearest.rodovia}, km ${nearest.km} ${nearest.sentido} (${dist.toFixed(1)} m)`;
-          if (dist > 500) {
+          if (parseFloat(dist) > 500) {
             mensagem += "\nPossivelmente fora da faixa de domínio da concessionária";
           }
           document.getElementById("output").textContent = mensagem;
-        }, 500); // pequena pausa para simular processamento
+        }, 500);
       },
       error => {
         alert("Erro ao obter localização: " + error.message);
