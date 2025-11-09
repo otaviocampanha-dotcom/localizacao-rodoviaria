@@ -51,6 +51,11 @@
 
   <div id="botoes">
   <button onclick="iniciarLocalizacao()">Obter Localização Atual</button>
+    <br><br>
+<button onclick="salvarPontoA()">Salvar como ponto A</button>
+<button onclick="calcularDistanciaComPontoA()">Calcular distância até ponto A</button>
+<p id="resultadoPontoA"></p>
+
   <input type="file" id="fotoInput" accept="image/*" />
   <button onclick="usarLocalizacaoDaFoto()">Usar localização da foto</button>
 </div>
@@ -79,6 +84,7 @@
     let ultimaLat = null;
     let ultimaLon = null;
     let pontoMaisProximo = null;
+    let pontoA = null;
 
     function parseCSV(text) {
       const lines = text.trim().split(/\r?\n/);
@@ -269,10 +275,29 @@ function calcularDistanciaManual() {
   const distancia = calcularDistanciaMacro(latA, lonA, latB, lonB);
   document.getElementById("resultadoDistancia").textContent = `Distância: ${distancia.toFixed(1)} metros`;
 }
+    function salvarPontoA() {
+  if (ultimaLat && ultimaLon) {
+    pontoA = { lat: ultimaLat, lon: ultimaLon };
+    document.getElementById("resultadoPontoA").textContent = "📍 Ponto A salvo com sucesso.";
+  } else {
+    document.getElementById("resultadoPontoA").textContent = "⚠️ Nenhuma localização disponível para salvar.";
+  }
+}
+
+function calcularDistanciaComPontoA() {
+  if (!pontoA || !ultimaLat || !ultimaLon) {
+    document.getElementById("resultadoPontoA").textContent = "⚠️ Salve o ponto A e obtenha a localização atual primeiro.";
+    return;
+  }
+
+  const distancia = calcularDistanciaMacro(pontoA.lat, pontoA.lon, ultimaLat, ultimaLon);
+  document.getElementById("resultadoPontoA").textContent = `📏 Distância até ponto A: ${distancia.toFixed(1)} metros`;
+}
 </script>
   </script>
 </body>
 </html>
+
 
 
 
