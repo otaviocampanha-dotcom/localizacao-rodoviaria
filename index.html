@@ -18,6 +18,24 @@
       cursor: pointer;
       display: inline-block;
     }
+    #botoes {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 600px) {
+    #botoes {
+      width: 100%;
+    }
+
+    button, input[type="file"] {
+      width: 100%;
+    }
+  }
+
   </style>
 </head>
 <body>
@@ -225,5 +243,6 @@
   </script>
 </body>
 </html>
+
 
 
