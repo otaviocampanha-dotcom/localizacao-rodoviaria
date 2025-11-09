@@ -22,8 +22,12 @@
 <body>
   <h2>📍 Localização Rodoviária</h2>
 
-  <label for="csvFile">Carregar Cadastro Rodovia</label>
-  <input type="file" id="csvFile" accept=".csv" style="display:none;" />
+ <script>
+  fetch('Relação Total - Lote 13 adaptada.csv')
+    .then(response => response.text())
+    .then(texto => parseCSV(texto));
+</script>
+
   <button onclick="iniciarLocalizacao()">Obter Localização Atual</button>
 
   <br><br>
@@ -220,3 +224,4 @@
   </script>
 </body>
 </html>
+
