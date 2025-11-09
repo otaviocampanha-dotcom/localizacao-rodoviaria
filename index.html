@@ -59,8 +59,19 @@
   <p>Precisão: <span id="precisao">--</span></p>
   <p id="alerta"></p>
   <p id="output"></p>
-  <button id="mapaBtn" onclick="abrirNoMaps()">Abrir minha localização no Google Maps</button>
-  <button id="pontoBtn" onclick="abrirPontoNoMaps()">Abrir ponto mais próximo no Google Maps</button>
+
+<h3>📏 Calcular distância entre dois pontos</h3>
+<div id="distanciaManual">
+  <label>Latitude A: <input type="number" step="any" id="latA"></label><br>
+  <label>Longitude A: <input type="number" step="any" id="lonA"></label><br>
+  <label>Latitude B: <input type="number" step="any" id="latB"></label><br>
+  <label>Longitude B: <input type="number" step="any" id="lonB"></label><br>
+  <button onclick="calcularDistanciaManual()">Calcular distância</button>
+  <p id="resultadoDistancia"></p>
+</div>
+
+<button id="mapaBtn" onclick="abrirNoMaps()">Abrir minha localização no Google Maps</button>
+<button id="pontoBtn" onclick="abrirPontoNoMaps()">Abrir ponto mais próximo no Google Maps</button>
 
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <script>
@@ -244,6 +255,7 @@
   </script>
 </body>
 </html>
+
 
 
 
