@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Localização Rodoviária</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Localização Rodoviária</title>
   <style>
     body { font-family: Arial; padding: 20px; }
     button, label { margin: 5px; }
@@ -23,14 +23,14 @@
 <body>
   <h2>📍 Localização Rodoviária</h2>
   <img src="logo.jpg" alt="Logo da empresa" style="max-width: 200px; display: block; margin: 0 auto 20px;">
- <script>
-  fetch('Relação Total - Lote 13 adaptada.csv')
-    .then(response => response.text())
-    .then(texto => parseCSV(texto));
-</script>
+
+  <script>
+    fetch('Relação Total - Lote 13 adaptada.csv')
+      .then(response => response.text())
+      .then(texto => parseCSV(texto));
+  </script>
 
   <button onclick="iniciarLocalizacao()">Obter Localização Atual</button>
-
   <br><br>
   <input type="file" id="fotoInput" accept="image/*" />
   <button onclick="usarLocalizacaoDaFoto()">Usar localização da foto</button>
@@ -49,10 +49,11 @@
     let ultimaLat = null;
     let ultimaLon = null;
     let pontoMaisProximo = null;
-function abrirNoGoogleMaps(latitude, longitude) {
-  const url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latitude},${longitude}`;
-  window.open(url, '_blank');
-}
+
+    function abrirNoGoogleMaps(latitude, longitude) {
+      const url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latitude},${longitude}`;
+      window.open(url, '_blank');
+    }
 
     function parseCSV(text) {
       const lines = text.trim().split(/\r?\n/);
@@ -84,7 +85,7 @@ function abrirNoGoogleMaps(latitude, longitude) {
       alert("Planilha carregada com " + points.length + " pontos.");
     }
 
-    document.getElementById("csvFile").addEventListener("change", function () {
+    document.getElementById("csvFile")?.addEventListener("change", function () {
       const reader = new FileReader();
       reader.onload = () => parseCSV(reader.result);
       reader.readAsText(this.files[0]);
@@ -200,17 +201,14 @@ function abrirNoGoogleMaps(latitude, longitude) {
     }
 
     function abrirNoMaps() {
-   if (ultimaLat && ultimaLon) {
-    const url = `https://www.google.com/maps?q=${ultimaLat},${ultimaLon}`;
-    window.open(url, "_blank");
-}
-
+      if (ultimaLat && ultimaLon) {
+        abrirNoGoogleMaps(ultimaLat, ultimaLon);
+      }
     }
 
     function abrirPontoNoMaps() {
       if (pontoMaisProximo && pontoMaisProximo.lat && pontoMaisProximo.lon) {
-        const url = `https://www.google.com/maps?q=${pontoMaisProximo.lat},${pontoMaisProximo.lon}`;
-        window.open(url, "_blank");
+        abrirNoGoogleMaps(pontoMaisProximo.lat, pontoMaisProximo.lon);
       }
     }
 
@@ -222,18 +220,23 @@ function abrirNoGoogleMaps(latitude, longitude) {
       const lat2r = toRad(90 - lat2);
       const lonDiff = toRad(lon1 - lon2);
 
-      const cosDist = Math.cos(lat1r) * Math.cos(lat2r) + Math.sin(lat1r) * Math.sin(lat2r) * Math.cos(lonDiff);
-      const dist = R * Math.acos(cosDist) * 1000; // metros
+      const cosDist =
+        function calcularDistanciaMacro(lat1, lon1, lat2, lon2) {
+  const toRad = deg => deg * Math.PI / 180;
+  const R = 6371; // raio da Terra em km
 
-      return dist;
-    }
-  </script>
-  function abrirNoGoogleMaps(latitude, longitude) {
-    const url = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latitude},${longitude}`;
-    window.open(url, '_blank');
-  }
+  const lat1r = toRad(90 - lat1);
+  const lat2r = toRad(90 - lat2);
+  const lonDiff = toRad(lon1 - lon2);
+
+  const cosDist = Math.cos(lat1r) * Math.cos(lat2r) +
+                  Math.sin(lat1r) * Math.sin(lat2r) * Math.cos(lonDiff);
+
+  const dist = R * Math.acos(cosDist) * 1000; // resultado em metros
+
+  return dist;
+}
 </script>
-
 </body>
 </html>
 
