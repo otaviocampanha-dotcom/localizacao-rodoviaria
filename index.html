@@ -13,19 +13,10 @@
       margin-left: auto;
       margin-right: auto;
     }
-
     h2 {
       text-align: center;
     }
-
-    img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 0 auto 20px;
-    }
-
-    button, label {
+    button {
       font-size: 18px;
       padding: 12px 20px;
       margin: 10px auto;
@@ -34,59 +25,33 @@
       max-width: 400px;
       text-align: center;
     }
-
     input[type="file"] {
       display: block;
       margin: 10px auto;
     }
-
     #alerta {
       color: red;
       font-weight: bold;
       text-align: center;
       margin-top: 10px;
     }
-
     #output {
       white-space: pre-line;
       font-weight: bold;
       text-align: center;
       margin-top: 10px;
     }
-
     #mapaBtn, #pontoBtn {
       display: none;
       margin-top: 10px;
     }
-
-    label[for="csvFile"] {
-      background: #0078D4;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      display: inline-block;
-    }
   </style>
 </head>
 <body>
-
-  <!-- ✅ Logo único e centralizado -->
-  <img src="logo.jpg" alt="Logo do site" style="height: 80px;" />
-
   <h2>📍 Localização Rodoviária</h2>
-
-  <script>
-    fetch('Relação Total - Lote 13 adaptada.csv')
-      .then(response => response.text())
-      .then(texto => parseCSV(texto));
-  </script>
-
   <button onclick="iniciarLocalizacao()">Obter Localização Atual</button>
-
   <input type="file" id="fotoInput" accept="image/*" />
   <button onclick="usarLocalizacaoDaFoto()">Usar localização da foto</button>
-
   <p>Latitude: <span id="lat">--</span></p>
   <p>Longitude: <span id="lon">--</span></p>
   <p>Precisão: <span id="precisao">--</span></p>
@@ -94,79 +59,70 @@
   <p id="output"></p>
   <button id="mapaBtn" onclick="abrirNoMaps()">Abrir minha localização no Google Maps</button>
   <button id="pontoBtn" onclick="abrirPontoNoMaps()">Abrir ponto mais próximo no Google Maps</button>
-
-  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  https://cdn.jsdelivr.net/npm/exif-js</script>
   <script>
     let points = [];
     let ultimaLat = null;
     let ultimaLon = null;
     let pontoMaisProximo = null;
 
+    // Carrega CSV
+    fetch('pontos.csv')
+      .then(response => response.text())
+      .then(texto => parseCSV(texto));
+
     function parseCSV(text) {
       const lines = text.trim().split(/\r?\n/);
       points = [];
-
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
-
-        const sep = line.includes(";") ? ";" : ",";
+        const sep = line.includes(';') ? ';' : ',';
         const cols = line.split(sep);
-
         if (cols.length < 5) continue;
-
-        const lat = parseFloat(cols[3].replace(",", ".").replace(/"/g, ""));
-        const lon = parseFloat(cols[4].replace(",", ".").replace(/"/g, ""));
-
+        const lat = parseFloat(cols[3].replace(',', '.').replace(/"/g, ''));
+        const lon = parseFloat(cols[4].replace(',', '.').replace(/"/g, ''));
         if (isNaN(lat) || isNaN(lon)) continue;
-
         points.push({
-          rodovia: cols[0].replace(/"/g, "").trim(),
-          km: cols[1].replace(/"/g, "").trim(),
-          sentido: cols[2].replace(/"/g, "").trim(),
+          rodovia: cols[0].replace(/"/g, '').trim(),
+          km: cols[1].replace(/"/g, '').trim(),
+          sentido: cols[2].replace(/"/g, '').trim(),
           lat,
           lon
         });
       }
-
-      alert("Planilha carregada com " + points.length + " pontos.");
+      alert('Planilha carregada com ' + points.length + ' pontos.');
     }
 
     function iniciarLocalizacao() {
       if (!points.length) {
-        alert("Carregue a planilha primeiro.");
+        alert('Carregue a planilha primeiro.');
         return;
       }
-
-      document.getElementById("output").textContent = "Calculando menor distância, aguarde…";
-      document.getElementById("mapaBtn").style.display = "none";
-      document.getElementById("pontoBtn").style.display = "none";
-
+      document.getElementById('output').textContent = 'Calculando menor distância, aguarde…';
+      document.getElementById('mapaBtn').style.display = 'none';
+      document.getElementById('pontoBtn').style.display = 'none';
       navigator.geolocation.getCurrentPosition(pos => {
         const lat1 = pos.coords.latitude;
         const lon1 = pos.coords.longitude;
         const accuracy = pos.coords.accuracy;
-
         ultimaLat = lat1;
         ultimaLon = lon1;
-
-        document.getElementById("lat").textContent = lat1.toFixed(6);
-        document.getElementById("lon").textContent = lon1.toFixed(6);
-        document.getElementById("precisao").textContent = accuracy + " metros";
-
+        document.getElementById('lat').textContent = lat1.toFixed(6);
+        document.getElementById('lon').textContent = lon1.toFixed(6);
+        document.getElementById('precisao').textContent = accuracy + ' metros';
         if (accuracy > 300) {
-          document.getElementById("alerta").textContent = "⚠️ GPS muito impreciso. Aguarde melhor sinal.";
+          document.getElementById('alerta').textContent = '⚠️ GPS muito impreciso. Aguarde melhor sinal.';
           return;
         } else if (accuracy > 100) {
-          document.getElementById("alerta").textContent = "⚠️ GPS moderado. Dados podem ter pequena variação.";
+          document.getElementById('alerta').textContent = '⚠️ GPS moderado. Dados podem ter pequena variação.';
         } else {
-          document.getElementById("alerta").textContent = "";
+          document.getElementById('alerta').textContent = '';
         }
-
         calcularPontoMaisProximo(lat1, lon1);
       },
       error => {
-        alert("Erro ao obter localização: " + error.message);
+        alert('Erro ao obter localização: ' + error.message);
       },
       {
         enableHighAccuracy: true,
@@ -176,34 +132,28 @@
     }
 
     function usarLocalizacaoDaFoto() {
-      const fileInput = document.getElementById("fotoInput");
+      const fileInput = document.getElementById('fotoInput');
       const file = fileInput.files[0];
       if (!file) {
-        alert("Selecione uma foto primeiro.");
+        alert('Selecione uma foto primeiro.');
         return;
       }
-
       EXIF.getData(file, function () {
-        const lat = EXIF.getTag(this, "GPSLatitude");
-        const lon = EXIF.getTag(this, "GPSLongitude");
-        const latRef = EXIF.getTag(this, "GPSLatitudeRef");
-        const lonRef = EXIF.getTag(this, "GPSLongitudeRef");
-
+        const lat = EXIF.getTag(this, 'GPSLatitude');
+        const lon = EXIF.getTag(this, 'GPSLongitude');
+        const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
+        const lonRef = EXIF.getTag(this, 'GPSLongitudeRef');
         if (!lat || !lon || !latRef || !lonRef) {
-          document.getElementById("output").textContent = "Não identificado a informação de localização da foto";
+          document.getElementById('output').textContent = 'Não identificado a informação de localização da foto';
           return;
         }
-
         const latitude = convertDMSToDD(lat, latRef);
         const longitude = convertDMSToDD(lon, lonRef);
-
         ultimaLat = latitude;
         ultimaLon = longitude;
-
-        document.getElementById("lat").textContent = latitude.toFixed(6);
-        document.getElementById("lon").textContent = longitude.toFixed(6);
-        document.getElementById("precisao").textContent = "Extraída da foto";
-
+        document.getElementById('lat').textContent = latitude.toFixed(6);
+        document.getElementById('lon').textContent = longitude.toFixed(6);
+        document.getElementById('precisao').textContent = 'Extraída da foto';
         calcularPontoMaisProximo(latitude, longitude);
       });
     }
@@ -211,14 +161,25 @@
     function convertDMSToDD(dms, ref) {
       const [deg, min, sec] = dms;
       let dd = deg + min / 60 + sec / 3600;
-      if (ref === "S" || ref === "W") dd *= -1;
+      if (ref === 'S' || ref === 'W') dd *= -1;
       return dd;
+    }
+
+    // Função baseada na fórmula da planilha
+    function calcularDistanciaMacro(lat1, lon1, lat2, lon2) {
+      const R = 6371; // raio da Terra em km
+      const toRad = deg => deg * Math.PI / 180;
+      const dist = Math.acos(
+        Math.cos(toRad(90 - lat1)) * Math.cos(toRad(90 - lat2)) +
+        Math.sin(toRad(90 - lat1)) * Math.sin(toRad(90 - lat2)) *
+        Math.cos(toRad(lon1 - lon2))
+      );
+      return R * dist * 1000; // retorna em metros
     }
 
     function calcularPontoMaisProximo(lat1, lon1) {
       let minDist = Infinity;
       let nearest = null;
-
       points.forEach(p => {
         const dist = calcularDistanciaMacro(lat1, lon1, p.lat, p.lon);
         if (dist < minDist) {
@@ -227,33 +188,30 @@
           nearest.distancia = dist;
         }
       });
-
       pontoMaisProximo = nearest;
-
       const dist = nearest.distancia;
       let mensagem = `Mais próximo: ${nearest.rodovia}, km ${nearest.km} ${nearest.sentido} (${dist.toFixed(1)} m)`;
       if (dist > 500) {
-        mensagem += "\nPossivelmente fora da faixa de domínio da concessionária";
+        mensagem += '\nPossivelmente fora da faixa de domínio da concessionária';
       }
-
-      document.getElementById("output").textContent = mensagem;
-      document.getElementById("mapaBtn").style.display = "inline-block";
-      document.getElementById("pontoBtn").style.display = "inline-block";
+      document.getElementById('output').textContent = mensagem;
+      document.getElementById('mapaBtn').style.display = 'inline-block';
+      document.getElementById('pontoBtn').style.display = 'inline-block';
     }
 
     function abrirNoMaps() {
       if (ultimaLat && ultimaLon) {
         const url = `https://www.google.com/maps?q=${ultimaLat},${ultimaLon}`;
-        window.open(url, "_blank");
+        window.open(url, '_blank');
       }
     }
 
     function abrirPontoNoMaps() {
-  if (pontoMaisProximo && pontoMaisProximo.lat && pontoMaisProximo.lon) {
-    const url = `https://www.google.com/maps?q=${pontoMaisProximo.lat},${pontoMaisProximo.lon}`;
-    window.open(url, "_blank");
-  }
-}
-</script>
+      if (pontoMaisProximo && pontoMaisProximo.lat && pontoMaisProximo.lon) {
+        const url = `https://www.google.com/maps?q=${pontoMaisProximo.lat},${pontoMaisProximo.lon}`;
+        window.open(url, '_blank');
+      }
+    }
+  </script>
 </body>
 </html>
