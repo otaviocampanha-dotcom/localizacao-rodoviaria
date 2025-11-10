@@ -71,7 +71,11 @@
   <p id="output"></p>
   <button id="mapaBtn" onclick="abrirNoMaps()">Abrir minha localização no Google Maps</button>
   <button id="pontoBtn" onclick="abrirPontoNoMaps()">Abrir ponto mais próximo no Google Maps</button>
-
+<h3>Histórico de Leituras</h3>
+<div id="historico" style="font-size:14px; font-weight:normal; border:1px solid #ccc; padding:10px; max-height:200px; overflow-y:auto;"></div>
+<button onclick="limparHistorico()" style="margin-top:10px; background:#d9534f; color:white; padding:6px 12px; border:none; border-radius:4px; cursor:pointer;">
+  Limpar Histórico
+</button>
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <script>
     let points = [];
@@ -222,6 +226,7 @@
       document.getElementById("output").textContent = mensagem;
       document.getElementById("mapaBtn").style.display = "inline-block";
       document.getElementById("pontoBtn").style.display = "inline-block";
+      adicionarAoHistorico(lat1, lon1, mensagem);
     }
 
     function abrirNoMaps() {
@@ -251,9 +256,19 @@
 
       return dist;
     }
+    function adicionarAoHistorico(lat, lon, mensagem) {
+  const historicoDiv = document.getElementById("historico");
+  const novaLinha = `<p>Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)} → ${mensagem}</p>`;
+  historicoDiv.innerHTML += novaLinha;
+}
+
+function limparHistorico() {
+  document.getElementById("historico").innerHTML = "";
+}
   </script>
 </body>
 </html>
+
 
 
 
